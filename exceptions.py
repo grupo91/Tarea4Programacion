@@ -13,7 +13,7 @@ class InvalidDataError(SystemError):
     pass
 
 class ServiceUnavailableError(SystemError):
-    # service not avaible
+    # service not available
     pass
 
 class ReservationError(SystemError):

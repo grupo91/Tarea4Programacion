@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 
 class Entity(ABC):
     
-    # Base abstract class that esforces structure for all entities
+    # Base abstract class that enforces structure for all entities
         
     def __init__(self, id):
         self._id = id
