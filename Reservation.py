@@ -1,129 +1,290 @@
 from datetime import datetime
+from exceptions import ReservationError
+from logger_config import setup_logger
+
+# Configurar logger
+logger = setup_logger()
 
 
-class Reservation:
-    def __init__(self, client, service, duration):
+class Reserva:
+
+    def __init__(self, cliente, servicio, duracion):
+
         try:
-            self.client = client
-            self.service = service
-            self.duration = duration
-            self.status = "Pending"
-            self.total_cost = 0
+            self.cliente = cliente
+            self.servicio = servicio
+            self.duracion = duracion
+            self.estado = "Pendiente"
+            self.costo_total = 0
 
-            self.validate_reservation()
-            self.write_log("Reservation created successfully.")
+            self.validar_reserva()
+
+            self.escribir_log("Reserva creada correctamente.")
 
         except Exception as error:
-            self.write_log("Error creating reservation: " + str(error))
-            raise ReservationError("The reservation could not be created.") from error
+
+            self.escribir_log(
+                "Error al crear la reserva: " + str(error)
+            )
+
+            raise ReservationError(
+                "La reserva no pudo ser creada."
+            ) from error
 
         finally:
-            print("Reservation creation process finished.")
+            print("Proceso de creación de reserva finalizado.")
 
-    def validate_reservation(self):
+    # ==================================================
+    # VALIDAR RESERVA
+    # ==================================================
+
+    def validar_reserva(self):
+
         try:
-            if self.client is None:
-                raise ReservationError("Client is required.")
 
-            if self.service is None:
-                raise ReservationError("Service is required.")
+            if self.cliente is None:
+                raise ReservationError(
+                    "El cliente es obligatorio."
+                )
 
-            if self.duration is None:
-                raise ReservationError("Duration is required.")
+            if self.servicio is None:
+                raise ReservationError(
+                    "El servicio es obligatorio."
+                )
 
-            if not isinstance(self.duration, (int, float)):
-                raise ReservationError("Duration must be a number.")
+            if self.duracion is None:
+                raise ReservationError(
+                    "La duración es obligatoria."
+                )
 
-            if self.duration <= 0:
-                raise ReservationError("Duration must be greater than zero.")
+            if not isinstance(self.duracion, (int, float)):
+                raise ReservationError(
+                    "La duración debe ser numérica."
+                )
 
-            if self.status not in ["Pending", "Confirmed", "Cancelled", "Processed"]:
-                raise ReservationError("Invalid reservation status.")
+            if self.duracion <= 0:
+                raise ReservationError(
+                    "La duración debe ser mayor que cero."
+                )
+
+            if self.estado not in [
+                "Pendiente",
+                "Confirmada",
+                "Cancelada",
+                "Procesada"
+            ]:
+                raise ReservationError(
+                    "Estado de reserva inválido."
+                )
 
         except ReservationError as error:
-            self.write_log("Validation error: " + str(error))
+
+            self.escribir_log(
+                "Error de validación: " + str(error)
+            )
+
             raise
 
-    def confirm_reservation(self):
+    # ==================================================
+    # CONFIRMAR RESERVA
+    # ==================================================
+
+    def confirmar_reserva(self):
+
         try:
-            if self.status == "Cancelled":
-                raise ReservationError("A cancelled reservation cannot be confirmed.")
 
-            if self.status == "Processed":
-                raise ReservationError("A processed reservation cannot be confirmed again.")
+            if self.estado == "Cancelada":
+                raise ReservationError(
+                    "Una reserva cancelada no puede confirmarse."
+                )
 
-            if self.status == "Confirmed":
-                raise ReservationError("The reservation is already confirmed.")
+            if self.estado == "Procesada":
+                raise ReservationError(
+                    "Una reserva procesada no puede confirmarse nuevamente."
+                )
+
+            if self.estado == "Confirmada":
+                raise ReservationError(
+                    "La reserva ya está confirmada."
+                )
 
         except ReservationError as error:
-            self.write_log("Error confirming reservation: " + str(error))
+
+            self.escribir_log(
+                "Error al confirmar reserva: " + str(error)
+            )
+
             print("Error:", error)
 
         else:
-            self.status = "Confirmed"
-            self.write_log("Reservation confirmed.")
-            print("Reservation confirmed successfully.")
+
+            self.estado = "Confirmada"
+
+            self.escribir_log(
+                "Reserva confirmada correctamente."
+            )
+
+            print(
+                "Reserva confirmada correctamente."
+            )
 
         finally:
-            print("Confirmation process finished.")
 
-    def cancel_reservation(self):
+            print(
+                "Proceso de confirmación finalizado."
+            )
+
+    # ==================================================
+    # CANCELAR RESERVA
+    # ==================================================
+
+    def cancelar_reserva(self):
+
         try:
-            if self.status == "Processed":
-                raise ReservationError("A processed reservation cannot be cancelled.")
 
-            if self.status == "Cancelled":
-                raise ReservationError("The reservation is already cancelled.")
+            if self.estado == "Procesada":
+                raise ReservationError(
+                    "Una reserva procesada no puede cancelarse."
+                )
+
+            if self.estado == "Cancelada":
+                raise ReservationError(
+                    "La reserva ya está cancelada."
+                )
 
         except ReservationError as error:
-            self.write_log("Error cancelling reservation: " + str(error))
+
+            self.escribir_log(
+                "Error al cancelar reserva: " + str(error)
+            )
+
             print("Error:", error)
 
         else:
-            self.status = "Cancelled"
-            self.write_log("Reservation cancelled.")
-            print("Reservation cancelled successfully.")
+
+            self.estado = "Cancelada"
+
+            self.escribir_log(
+                "Reserva cancelada correctamente."
+            )
+
+            print(
+                "Reserva cancelada correctamente."
+            )
 
         finally:
-            print("Cancellation process finished.")
 
-    def process_reservation(self):
+            print(
+                "Proceso de cancelación finalizado."
+            )
+
+    # ==================================================
+    # PROCESAR RESERVA
+    # ==================================================
+
+    def procesar_reserva(self):
+
         try:
-            if self.status != "Confirmed":
-                raise ReservationError("Only confirmed reservations can be processed.")
+
+            if self.estado != "Confirmada":
+                raise ReservationError(
+                    "Solo las reservas confirmadas pueden procesarse."
+                )
 
             try:
-                self.total_cost = self.service.calculate_cost(self.duration)
+
+                self.costo_total = (
+                    self.servicio.calcular_costo(
+                        self.duracion,
+                        impuesto=0.19,
+                        descuento=0.05
+                    )
+                )
 
             except Exception as error:
-                self.write_log("Cost calculation error: " + str(error))
-                raise ReservationError("There was a problem calculating the reservation cost.") from error
 
-            if self.total_cost <= 0:
-                raise ReservationError("The total cost is not valid.")
+                self.escribir_log(
+                    "Error en cálculo de costo: " + str(error)
+                )
+
+                raise ReservationError(
+                    "Hubo un problema calculando el costo de la reserva."
+                ) from error
+
+            if self.costo_total <= 0:
+                raise ReservationError(
+                    "El costo total es inválido."
+                )
 
         except ReservationError as error:
-            self.write_log("Error processing reservation: " + str(error))
+
+            self.escribir_log(
+                "Error al procesar reserva: " + str(error)
+            )
+
             print("Error:", error)
 
         else:
-            self.status = "Processed"
-            self.write_log("Reservation processed. Total cost: " + str(self.total_cost))
-            print("Reservation processed successfully.")
-            print("Total cost:", self.total_cost)
+
+            self.estado = "Procesada"
+
+            self.escribir_log(
+                f"Reserva procesada correctamente. Costo total: {self.costo_total}"
+            )
+
+            print(
+                "Reserva procesada correctamente."
+            )
+
+            print(
+                "Costo total:",
+                self.costo_total
+            )
 
         finally:
-            print("Processing reservation finished.")
 
-    def show_reservation(self):
-        print("\n--- Reservation Information ---")
-        print("Client:", self.client)
-        print("Service:", self.service)
-        print("Duration:", self.duration)
-        print("Status:", self.status)
-        print("Total cost:", self.total_cost)
+            print(
+                "Proceso de procesamiento finalizado."
+            )
 
-    def write_log(self, message):
-        with open("system_logs.txt", "a", encoding="utf-8") as file:
-            date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            file.write(date + " - " + message + "\n")
+    # ==================================================
+    # MOSTRAR RESERVA
+    # ==================================================
+
+    def mostrar_reserva(self):
+
+        print("\n--- Información de la Reserva ---")
+
+        print("Cliente:", self.cliente)
+
+        print("Servicio:", self.servicio)
+
+        print("Duración:", self.duracion)
+
+        print("Estado:", self.estado)
+
+        print("Costo total:", self.costo_total)
+
+    # ==================================================
+    # MÉTODO LOG
+    # ==================================================
+
+    def escribir_log(self, mensaje):
+
+        logger.info(mensaje)
+
+    # ==================================================
+    # REPRESENTACIÓN EN STRING
+    # ==================================================
+
+    def __str__(self):
+
+        return (
+            f"Reserva("
+            f"Cliente={self.cliente}, "
+            f"Servicio={self.servicio}, "
+            f"Duración={self.duracion}, "
+            f"Estado={self.estado}, "
+            f"Costo={self.costo_total}"
+            f")"
+        )
