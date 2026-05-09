@@ -1,5 +1,3 @@
-
-
 # exceptions.py 
 # defines custom exceptions for the sistem to handle errors properly.
 

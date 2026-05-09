@@ -1,7 +1,3 @@
-
-
-
-
 # entity.py abstract class for all entities in the system
 
 from abc import ABC, abstractmethod
